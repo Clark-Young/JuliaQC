@@ -18,6 +18,47 @@ using SpecialFunctions
 include("HF.jl")
 using .HF
 
+struct symmetric2eIntegralMatrix # Store the double electron integrals more efficiently
+    dim::Int64
+    matrix::Array{Float64, 1}
+end
+
+function symmetric2eIntegralMatrix(dim::Int64) # Initialize the symmetric integral matrix
+    size = div(dim * (dim + 1) * (dim * (dim + 1) + 2), 8) # size = (N * (N + 1) * (N * (N + 1) + 2)) / 8
+    matrix = Vector{Float64}(undef, size)
+    return symmetric2eIntegralMatrix(dim, matrix)
+end
+
+function index421(a::Int, b::Int64, c::Int64, d::Int64)
+    if a >b 
+        ab = a * (a + 1) / 2 + b
+    else
+        ab = b * (b + 1) / 2 + a
+    end
+    if c > d
+        cd = c * (c + 1) / 2 + d
+    else
+        cd = d * (d + 1) / 2 + c
+    end
+    if ab > cd
+        abcd = ab * (ab + 1) / 2 + cd
+    else
+        abcd = cd * (cd + 1) / 2 + ab
+    end
+    return Int64(abcd)
+end
+
+function Base.getindex(s2e::symmetric2eIntegralMatrix, a::Int64, b::Int64, c::Int64, d::Int64)
+    idx = index421(a, b, c, d)
+    return s2e.matrix[idx]
+end
+
+function Base.setindex!(s2e::symmetric2eIntegralMatrix, value::Float64, a::Int64, b::Int64, c::Int64, d::Int64)
+    idx = index421(a, b, c, d)
+    s2e.matrix[idx] = value
+end
+
+
 struct gto # Define the struct of Gaussian Type Orbital
     center::Tuple{Float64,Float64,Float64} # The center of the GTO
     exponent::Float64 # The exponent of the GTO
@@ -319,44 +360,36 @@ function h_core(basis::Array{cgto,1}, atomlist::atomList)::Array{Float64,2}
 end
 
 
-function coulombIntegral(gto1::gto, gto2::gto, gto3::gto, gto4::gto, τ::Float64)::Float64
+function doubleElectronIntegral(gto1::gto, gto2::gto, gto3::gto, gto4::gto, τ::Float64)::Float64
 
 
 end
 
-function coulombIntegral(cgto1::cgto, cgto2::cgto, cgto3::cgto, cgto4::cgto, τ::Float64)::Float64
+function doubleElectronIntegral(cgto1::cgto, cgto2::cgto, cgto3::cgto, cgto4::cgto, τ::Float64)::Float64
     integral = 0.0
     for i in 1:length(cgto1.gtos)
         for j in 1:length(cgto2.gtos)
             for k in 1:length(cgto3.gtos)
                 for l in 1:length(cgto4.gtos)
-                    integral += cgto1.gtos[i].contractedCoeff * cgto2.gtos[j].contractedCoeff * cgto3.gtos[k].contractedCoeff * cgto4.gtos[l].contractedCoeff * coulombIntegral(cgto1.gtos[i], cgto2.gtos[j], cgto3.gtos[k], cgto4.gtos[l], τ)
+                    integral += cgto1.gtos[i].contractedCoeff * cgto2.gtos[j].contractedCoeff * cgto3.gtos[k].contractedCoeff * cgto4.gtos[l].contractedCoeff * doubleElectronIntegral(cgto1.gtos[i], cgto2.gtos[j], cgto3.gtos[k], cgto4.gtos[l], τ)
                 end
             end
         end
     end
-    return integral
+end
+
+
+function doubleElectronIntegral(basis::Array{cgto,1}, τ::Float64)
+
     
 end
 
-function exchangeIntegral(gto1::gto, gto2::gto, gto3::gto, gto4::gto, τ::Float64)::Float64
 
-end
 
-function exchangeIntegral(cgto1::cgto, cgto2::cgto, cgto3::cgto, cgto4::cgto, τ::Float64)::Float64
-    integral = 0.0
-    for i in 1:length(cgto1.gtos)
-        for j in 1:length(cgto2.gtos)
-            for k in 1:length(cgto3.gtos)
-                for l in 1:length(cgto4.gtos)
-                    integral += cgto1.gtos[i].contractedCoeff * cgto2.gtos[j].contractedCoeff * cgto3.gtos[k].contractedCoeff * cgto4.gtos[l].contractedCoeff * exchangeIntegral(cgto1.gtos[i], cgto2.gtos[j], cgto3.gtos[k], cgto4.gtos[l], τ)
-                end
-            end
-        end
-    end
-    return integral
-    
-end
+
+
+
+
 
 
 
