@@ -1,0 +1,4 @@
+name = "JuliaQC"
+uuid = "ba8a8010-9404-4800-b624-868259324848"
+authors = ["Chunyu Yang <chyyangustc@gmail.com>"]
+version = "0.1.0"
