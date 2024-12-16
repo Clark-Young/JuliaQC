@@ -47,6 +47,19 @@ function totalEnergy(P::Matrix, h_core::Matrix, Fock::Matrix)
     
 end
 
+#= The procedure of Roothaan-Hall SCF calculation:
+1. Specify a molecule (atom, geometry, charge, multiplicity, and basis set)
+2. Calculate all required molecular integrals (overlap, kinetic, nuclear attraction, electron repulsion)
+3. Diaognalize the overlap matrix S to get X (symmetric orthogonalization or canonical orthogonalization)
+4. Set the initial guess of the density matrix P
+5. Calculate the G matrix and Fock matrix (Fock = h_core + G)
+6. Transform the Fock matrix to the orthogonal basis FockPrime = X' * Fock * X
+7. Diagonalize the Fock matrix to get the orbital energies (ε) and coefficients (C')
+8. Calculate C = X * C', and then the new density matrix P_new
+9. If the difference between P_new and P is less than a certain threshold, return the total energy and the density matrix
+10. Otherwise, update P and repeat the above steps
+=#
+
 function SCF(h_core::Matrix, S::Matrix, integral2e::Array{Float64, 4}, N_e::Int, max_iter::Int, tol::Float64)
     n = size(h_core, 1)
     Fock = h_core
