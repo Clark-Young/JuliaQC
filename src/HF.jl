@@ -1,6 +1,22 @@
-#!/usr/bin/env julia
+# Description: This Julia Code is used to perform Hartree-Fock (HF) calculation.
+# Author: Chunyu Yang
+# Email: chunyu.yang@duke.edu, chyyangustc@outlook.com (permanent)
+# Organization: Department of Chemistry, Duke University
+# Date: 2024-12-15
+# Reference: Szabo and Ostlund's Modern Quantum Chemistry;
+#= Here we mainly use
+- Roothaan-Hall equation
+- Pople-Nesbet equation
+- Mulliken Population Analysis
+=#
+
+module HF
+
+export atomList, SCF, MullikenPopulationAnalysis
 
 using LinearAlgebra
+
+element2Z = Dict("H" => 1, "He" => 2, "Li" => 3, "Be" => 4, "B" => 5, "C" => 6, "N" => 7, "O" => 8, "F" => 9, "Ne" => 10, "Na" => 11, "Mg" => 12, "Al" => 13, "Si" => 14, "P" => 15, "S" => 16, "Cl" => 17, "Ar" => 18, "K" => 19, "Ca" => 20, "Sc" => 21, "Ti" => 22, "V" => 23, "Cr" => 24, "Mn" => 25, "Fe" => 26, "Co" => 27, "Ni" => 28, "Cu" => 29, "Zn" => 30, "Ga" => 31, "Ge" => 32, "As" => 33, "Se" => 34, "Br" => 35, "Kr" => 36, "Rb" => 37, "Sr" => 38, "Y" => 39, "Zr" => 40, "Nb" => 41, "Mo" => 42, "Tc" => 43, "Ru" => 44, "Rh" => 45, "Pd" => 46, "Ag" => 47, "Cd" => 48, "In" => 49, "Sn" => 50, "Sb" => 51, "Te" => 52, "I" => 53, "Xe" => 54, "Cs" => 55, "Ba" => 56, "La" => 57, "Ce" => 58, "Pr" => 59, "Nd" => 60, "Pm" => 61, "Sm" => 62, "Eu" => 63, "Gd" => 64, "Tb" => 65, "Dy" => 66, "Ho" => 67, "Er" => 68, "Tm" => 69, "Yb" => 70, "Lu" => 71, "Hf" => 72, "Ta" => 73, "W" => 74, "Re" => 75, "Os" => 76, "Ir" => 77, "Pt" => 78, "Au" => 79, "Hg" => 80, "Tl" => 81, "Pb" => 82)
 
 struct atomList
     atom::String
@@ -83,62 +99,5 @@ function MullikenPopulationAnalysis(atomlist::Vector,atom2basis::Vector,element2
     return MPA
 end
 
-element2Z = Dict("H" => 1, "He" => 2, "Li" => 3, "Be" => 4, "B" => 5, "C" => 6, "N" => 7, "O" => 8, "F" => 9, "Ne" => 10)
-atom2basis = [[1],[2]]
-atomlist = [atomList("H", 0.0, 0.0, 0.0, 1), atomList("H", 0.0, 0.0, 0.74, 2)]
 
-h_core = [-1.1204 -0.9584; -0.9584 -1.1204]
-S = [1.0 0.6593; 0.6593 1.0]
-
-integral2e=zeros(Float64, 2, 2, 2, 2)
-integral2e[1, 1, 1, 1] = 0.7746
-integral2e[2, 2, 2, 2] = 0.7746
-integral2e[1, 1, 2, 2] = 0.5697
-integral2e[2, 2, 1, 1] = 0.5697
-integral2e[1, 2, 1, 2] = 0.2970
-integral2e[2, 1, 2, 1] = 0.2970
-integral2e[1, 2, 2, 1] = 0.2970
-integral2e[2, 1, 1, 2] = 0.2970
-integral2e[1, 2, 2, 2] = 0.4441
-integral2e[2, 1, 2, 2] = 0.4441
-integral2e[2, 2, 1, 2] = 0.4441
-integral2e[2, 2, 2, 1] = 0.4441
-integral2e[1, 1, 1, 2] = 0.4441
-integral2e[1, 1, 2, 1] = 0.4441
-integral2e[1, 2, 1, 1] = 0.4441
-integral2e[2, 1, 1, 1] = 0.4441
-E0,P,ε=SCF(h_core, S, integral2e, 2, 100, 1e-8)
-println("The total energy of H2 is: ", E0, " Hartree.")
-MPA=MullikenPopulationAnalysis(atomlist,atom2basis,element2Z, P, S)
-println("The atomic charge of on H1 is: ", MPA[1], "; and the atomic charge of on H2 is: ", MPA[2], ".")
-
-h_core_HeH = [-2.6527 -1.3472;  -1.3472 -1.7318]
-S_HeH = [1.0 0.4508; 0.4508 1.0]
-integral2e_HeH=zeros(Float64, 2, 2, 2, 2)
-integral2e_HeH[1, 1, 1, 1] = 1.3072
-integral2e_HeH[2, 2, 2, 2] = 0.7746
-integral2e_HeH[1, 1, 2, 2] = 0.6057
-integral2e_HeH[2, 2, 1, 1] = 0.6057
-integral2e_HeH[1, 2, 1, 2] = 0.1773
-integral2e_HeH[2, 1, 2, 1] = 0.1773
-integral2e_HeH[1, 2, 2, 1] = 0.1773
-integral2e_HeH[2, 1, 1, 2] = 0.1773
-integral2e_HeH[1, 2, 2, 2] = 0.3118
-integral2e_HeH[2, 1, 2, 2] = 0.3118
-integral2e_HeH[2, 2, 1, 2] = 0.3118
-integral2e_HeH[2, 2, 2, 1] = 0.3118
-integral2e_HeH[1, 1, 1, 2] = 0.4373
-integral2e_HeH[1, 1, 2, 1] = 0.4373
-integral2e_HeH[1, 2, 1, 1] = 0.4373
-integral2e_HeH[2, 1, 1, 1] = 0.4373
-
-atomlist_HeH = [atomList("He", 0.0, 0.0, 0.0, 1), atomList("H", 0.0, 0.0, 1.4632, 2)]
-# SCF(h_core_HeH, S_HeH, integral2e_HeH, 2, 100, 1e-8)
-E0,P_HeH,ε=SCF(h_core_HeH, S_HeH, integral2e_HeH, 2, 100, 1e-8)
-MPA_HeH=MullikenPopulationAnalysis(atomlist_HeH,atom2basis,element2Z, P_HeH, S_HeH)
-
-println("The total energy of HeH is: ", E0, " Hartree.")
-println("The atomic charge of on He is: ", MPA_HeH[1], "; and the atomic charge of on H is: ", MPA_HeH[2], ".")
-
-
-
+end

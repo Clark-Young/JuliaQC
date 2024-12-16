@@ -1,3 +1,15 @@
+# Description: This Julia code is a submodule of JuliaQC, here we write some algorithms for quantum chemistry calculation.
+# Author: Chunyu Yang
+# Email: chunyu.yang@duke.edu, chyyangustc@outlook.com (permanent)
+# Organization: Department of Chemistry, Duke University
+# Date: 2024-12-15
+# Reference: Szabo and Ostlund's Modern Quantum Chemistry; Helgaker's Molecular Electronic Structure Theory.
+#= Here we mainly use
+- Davidson Diagonalization and Jocobi-Davidson Diagonalization
+- Romberg Integration
+=#
+
+
 using LinearAlgebra
 
 M = [1 2 3 4 ; 4 3 2 1 ; 1 2 3 4 ; 4 3 2 1]

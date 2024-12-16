@@ -14,6 +14,8 @@
 
 using LinearAlgebra
 using SpecialFunctions
+include("HF.jl")
+using .HF
 
 struct gto # Define the struct of Gaussian Type Orbital
     center::Tuple{Float64,Float64,Float64} # The center of the GTO
