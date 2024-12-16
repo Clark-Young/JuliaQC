@@ -9,6 +9,9 @@
 
 module JuliaQC
 
-greet() = print("Hello World!")
+include("InputIntrepreter.jl")
+using .InputIntrepreter
+
+
 
 end # module JuliaQC
