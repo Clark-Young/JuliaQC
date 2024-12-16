@@ -20,7 +20,16 @@ struct gto # Define the struct of Gaussian Type Orbital
     exponent::Float64 # The exponent of the GTO
     power::Tuple{Int,Int,Int} # The power of the GTO
     contractedCoeff::Float64 # The contracted coefficient of the GTO
-    function gto(gto1::gto, center::Tuple{Float64, Float64, Float64})
+    # Primary constructor
+    function gto(center::Tuple{Float64,Float64,Float64}, 
+        exponent::Float64,
+        power::Tuple{Int,Int,Int},
+        contractedCoeff::Float64=1.0)
+        new(center, exponent, power, contractedCoeff)
+    end
+
+    # Moving constructor
+    function gto(gto1::gto, center::Tuple{Float64,Float64,Float64})
         new(center, gto1.exponent, gto1.power, gto1.contractedCoeff)
     end
 end
@@ -30,6 +39,9 @@ end
 struct cgto
     center::Tuple{Float64,Float64,Float64}
     gtos::Array{gto,1}
+    function cgto(center::Tuple{Float64,Float64,Float64}, gtos::Array{gto,1})
+        new(center, gtos)
+    end
     function cgto(cgto1::cgto, center::Tuple{Float64,Float64,Float64})
         gtos = Array{gto,1}(undef, length(cgto1.gtos))
         for i in 1:length(cgto1.gtos)
