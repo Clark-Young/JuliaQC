@@ -12,7 +12,7 @@
 
 module HF
 
-export atomList, SCF, MullikenPopulationAnalysis
+export atomList, SCF, MullikenPopulationAnalysis, element2Z
 
 using LinearAlgebra
 

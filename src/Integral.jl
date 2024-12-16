@@ -9,6 +9,7 @@
 - Obara–Saika (OS) recurrence relations (for overlap and kinetic integral);
 - $1/r_{c} = ∫_{-∞}^{+∞} \exp (- (r-r_{c})^2 t^2 \mathrm{d} t$;
 - After recurrance relation, the four center integrals can become two center integrals.
+- The property of double electron integral: $(ij|kl) = (ij|lk) = (ji|kl) = (ji|lk) = (kl|ij) = (lk|ij) = (kl|ji) = (lk|ji)$
 =#
 
 
@@ -296,8 +297,25 @@ function nuclearAttractionIntegral(cgto1::cgto, cgto2::cgto, center::Tuple{Float
     return integral*charge
 end
 
-function nuclearAttractionIntegral(basis::Array{cgto,1}, )
+function nuclearAttractionIntegral(basis::Array{cgto,1}, atomlist::atomList)::Array{Float64,2}
+    n = length(basis)
+    V = zeros(n, n)
+    for i in 1:n
+        for j in 1:n
+            V[i, j] = nuclearAttractionIntegral(basis[i], basis[j], atomlist.center, element2Z[atomlist.atom])
+        end
+    end
+    return V
     
+end
+
+function h_core(basis::Array{cgto,1}, atomlist::atomList)::Array{Float64,2}
+    n = length(basis)
+    h = zeros(n, n)
+    T = kineticIntegral(basis)
+    V = nuclearAttractionIntegral(basis, atomlist)
+    h = T + V
+    return h
 end
 
 
