@@ -29,7 +29,7 @@ function symmetric2eIntegralMatrix(dim::Int64) # Initialize the symmetric integr
     return symmetric2eIntegralMatrix(dim, matrix)
 end
 
-function index421(a::Int, b::Int64, c::Int64, d::Int64)
+function index4to1(a::Int, b::Int64, c::Int64, d::Int64, dim::Int64) # Calculate the index of the symmetric integral matrix
     if a >b 
         ab = a * (a + 1) / 2 + b
     else
@@ -48,13 +48,14 @@ function index421(a::Int, b::Int64, c::Int64, d::Int64)
     return Int64(abcd)
 end
 
+
 function Base.getindex(s2e::symmetric2eIntegralMatrix, a::Int64, b::Int64, c::Int64, d::Int64)
-    idx = index421(a, b, c, d)
+    idx = index4to1(a, b, c, d, s2e.dim)
     return s2e.matrix[idx]
 end
 
 function Base.setindex!(s2e::symmetric2eIntegralMatrix, value::Float64, a::Int64, b::Int64, c::Int64, d::Int64)
-    idx = index421(a, b, c, d)
+    idx = index4to1(a, b, c, d, s2e.dim)
     s2e.matrix[idx] = value
 end
 
@@ -380,7 +381,20 @@ end
 
 
 function doubleElectronIntegral(basis::Array{cgto,1}, τ::Float64)
-
+    n = length(basis)
+    integral2e = symmetric2eIntegralMatrix(n)
+    for i in 1:n
+        for j in 1:i-1
+            for k in 1:n
+                for l in 1:k-1
+                    if i<k || (i==k && j<=l)
+                        integral2e[i, j, k, l] = doubleElectronIntegral(basis[i], basis[j], basis[k], basis[l], τ)
+                    end
+                end
+            end
+        end
+    end
+    return integral2e
     
 end
 
