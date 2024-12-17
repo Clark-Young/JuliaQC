@@ -15,6 +15,7 @@
 
 using LinearAlgebra
 using SpecialFunctions
+using PyCall
 include("HF.jl")
 using .HF
 
@@ -22,6 +23,29 @@ struct symmetric2eIntegralMatrix # Store the double electron integrals more effi
     dim::Int64
     matrix::Array{Float64, 1}
 end
+
+# Call PySCF to calculate the integrals
+function callPyscf(basis::String, mol::molecule, charge::Int64, multiplicity::Int64)
+    open("tmp.xyz", "w") do f
+        atomNum = length(molecule.atom)
+        write(f, "$atomNum\n")
+        write(f, "$charge $multiplicity $basis\n")
+        for i in mol.atomlist
+            write(f, "$i.atomName $i.x $i.y $i.z\n")
+        end
+    end
+    run(`python IntegralGen.py tmp.xyz`)
+    np = pyimport("numpy")
+    S = np.load("ovlp.npy")
+    T = np.load("kinetic.npy")
+    V = np.load("nuclear.npy")
+    integral2e = np.load("eri.npy")
+    h_core = T + V
+    return S, h_core, integral2e
+    
+end
+
+
 
 function symmetric2eIntegralMatrix(dim::Int64) # Initialize the symmetric integral matrix
     size = div(dim * (dim + 1) * (dim * (dim + 1) + 2), 8) # size = (N * (N + 1) * (N * (N + 1) + 2)) / 8
