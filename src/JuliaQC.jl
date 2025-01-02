@@ -12,6 +12,33 @@ module JuliaQC
 include("InputIntrepreter.jl")
 using .InputIntrepreter
 
+include("HF.jl")
+using .HF
+
+include("Integral.jl")
+using .Integral
+
+include("CC.jl")
+using .CC
+
+include("CI.jl")
+using .CI
+
+include("MP.jl")
+using .MP
+
+include("DFT.jl")
+using .DFT
+
+
+include("QCMath.jl")
+using .QCMath
+
+include("TDDFT.jl")
+using .TDDFT
+
+include("GW.jl")
+using .GW
 
 
 end # module JuliaQC

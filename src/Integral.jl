@@ -13,10 +13,13 @@
 =#
 
 
+module Integral
+
+export callPyscf
+
 using LinearAlgebra
 using SpecialFunctions
 using PyCall
-include("HF.jl")
 using .HF
 
 struct symmetric2eIntegralMatrix # Store the double electron integrals more efficiently
@@ -37,10 +40,9 @@ function callPyscf(basis::String, mol::molecule, charge::Int64, multiplicity::In
     run(`python IntegralGen.py tmp.xyz`)
     np = pyimport("numpy")
     S = np.load("ovlp.npy")
-    T = np.load("kinetic.npy")
-    V = np.load("nuclear.npy")
+    h_core = np.load("h_core.npy")
     integral2e = np.load("eri.npy")
-    h_core = T + V
+    # h_core = T + V
     return S, h_core, integral2e
     
 end
@@ -428,11 +430,4 @@ end
 
 
 
-
-
-
-
-
-
-
-overlapIntegral(gto1, gto2) * normalizeConstant(gto1) * normalizeConstant(gto2)
+end

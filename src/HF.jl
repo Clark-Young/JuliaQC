@@ -14,7 +14,6 @@ module HF
 
 export atomList, SCF, MullikenPopulationAnalysis, element2Z
 
-include("Integral.jl")
 using .Integral
 
 using LinearAlgebra

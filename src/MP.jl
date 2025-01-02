@@ -6,8 +6,6 @@
 # Reference: Szabo and Ostlund's Modern Quantum Chemistry; 
 
 module MP
-include("HF.jl")
-include("Integral.jl")
 using .HF
 using .Integral
 
